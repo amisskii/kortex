@@ -18,8 +18,9 @@
 
 import type { McpPage } from 'src/model/pages/mcp-page';
 
-import { test } from '../fixtures/electron-app';
+import { test } from '../fixtures/provider-fixtures';
 import { waitForNavigationReady } from '../utils/app-ready';
+import { hasApiKey, PROVIDERS } from '../utils/resource-helper';
 
 const DEFAULT_REGISTRY: string = 'MCP Registry example';
 const REGISTRY_URL: string = 'https://registry.modelcontextprotocol.io';
@@ -27,7 +28,11 @@ const GITHUB_MCP_SERVER: string = 'com.github.mcp';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? '';
 let mcpServersPage: McpPage;
 
-test.beforeEach(async ({ page, navigationBar }) => {
+test.beforeAll(async ({ page, navigationBar, resource }) => {
+  if (!hasApiKey(resource)) {
+    const provider = PROVIDERS[resource];
+    test.skip(true, `${provider.envVarName} environment variable is not set`);
+  }
   await waitForNavigationReady(page);
   mcpServersPage = await navigationBar.navigateToMCPPage();
 });
