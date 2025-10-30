@@ -31,7 +31,7 @@ export class McpEditRegistriesTabPage extends BaseTablePage {
   }
 
   async waitForLoad(): Promise<void> {
-    await expect(this.table).toBeVisible();
+    await expect(this.addMcpRegistryButton).toBeVisible();
   }
 
   async removeRegistry(name: string): Promise<void> {

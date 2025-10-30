@@ -19,6 +19,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 
 import { BasePage } from './base-page';
+import { McpInstallTabPage } from './mcp-install-tab-page';
 
 export class ChatPage extends BasePage {
   readonly toggleSidebarButton: Locator;
@@ -35,6 +36,7 @@ export class ChatPage extends BasePage {
   readonly chatHistoryItem: Locator;
   readonly chatHistoryItemMenuAction: Locator;
   readonly chatHistoryEmptyMessage: Locator;
+  readonly configureMcpServers: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -52,6 +54,7 @@ export class ChatPage extends BasePage {
     this.chatHistoryItem = page.locator('button[data-sidebar="menu-button"]');
     this.chatHistoryItemMenuAction = page.locator('button[data-sidebar="menu-action"]');
     this.chatHistoryEmptyMessage = page.getByText('Your conversations will appear here once you start chatting!');
+    this.configureMcpServers = page.getByRole('button', { name: 'Configure MCP servers' });
   }
 
   async waitForLoad(): Promise<void> {
@@ -158,5 +161,27 @@ export class ChatPage extends BasePage {
 
   async verifyConversationMessage(message: string): Promise<void> {
     await expect(this.conversationMessages.locator('p').getByText(message, { exact: true })).toBeVisible();
+  }
+
+  async verifyMcpServerAvailable(name: string): Promise<void> {
+    await expect(this.mcpDropdown).toBeEnabled();
+    await this.mcpDropdown.click();
+    const mcpServersDropdownMenu = this.page.getByRole('menu', { name: 'MCP Servers Dropdown Menu' });
+    await expect(mcpServersDropdownMenu).toBeVisible();
+    const mcpServerItem = mcpServersDropdownMenu.getByRole('menuitem', { name: name });
+    await expect(mcpServerItem).toBeVisible();
+  }
+
+  async verifyNoMcpServersInstalled(): Promise<void> {
+    await expect(this.mcpDropdown).toBeDisabled();
+    await expect(this.configureMcpServers).toBeEnabled();
+  }
+
+  async openMcpSetupIfNoneInstalled(): Promise<McpInstallTabPage> {
+    await this.verifyNoMcpServersInstalled();
+    await this.configureMcpServers.click();
+    const mcpInstallTabPage = new McpInstallTabPage(this.page);
+    await mcpInstallTabPage.waitForLoad();
+    return mcpInstallTabPage;
   }
 }

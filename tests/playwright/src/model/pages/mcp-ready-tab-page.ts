@@ -18,10 +18,9 @@
 
 import { expect, type Locator, type Page } from '@playwright/test';
 
-import { AddingMcpServerPage } from './adding-mcp-server-page';
 import { BaseTablePage } from './base-table-page';
 
-export class McpInstallTabPage extends BaseTablePage {
+export class McpReadyTabPage extends BaseTablePage {
   readonly noMcpServersAvailableHeading: Locator;
 
   constructor(page: Page) {
@@ -54,16 +53,13 @@ export class McpInstallTabPage extends BaseTablePage {
     await expect(this.noMcpServersAvailableHeading).not.toBeVisible({ timeout: timeout });
   }
 
-  async startMcpServerInstallation(name: string): Promise<AddingMcpServerPage> {
+  async removeMcpServer(name: string): Promise<void> {
     const mcpServer = await this.getTableRowByName(name);
     if (!mcpServer) {
-      throw Error("MCP server doesn't exist");
+      throw Error("MCP server doesn' t exist");
     }
-    const button = mcpServer.getByRole('button', { name: 'Install Remote server' });
-    await expect(button).toBeEnabled();
-    await button.click();
-    const addingMcpServerPage = new AddingMcpServerPage(this.page, name);
-    await addingMcpServerPage.waitForLoad();
-    return addingMcpServerPage;
+    const removeButton = mcpServer.getByRole('button', { name: 'Remove instance of MCP' });
+    await expect(removeButton).toBeEnabled();
+    await removeButton.click();
   }
 }

@@ -54,7 +54,7 @@ function onSelect(mcp: MCPRemoteServerInfo, event: Event): void {
       </Button>
     {/snippet}
   </DropdownMenuTrigger>
-  <DropdownMenuContent align="start" class="min-w-[300px]">
+  <DropdownMenuContent align="start" class="min-w-[300px]" aria-label="MCP Servers Dropdown Menu">
     {#if $mcpRemoteServerInfos.length === 0}
           <DropdownMenuItem
             disabled
